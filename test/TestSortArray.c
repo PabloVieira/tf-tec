@@ -76,16 +76,9 @@ TEST(SortArray, TestSortArray7)
     for( int state = 0; state <= 3; state++){ // state: RANDOM_ORDER, ASCENDING_ORDER, DESCENDING_ORDER, ALMOST_ORDERED
         // Create the vector with the specified size and situation
         int *vet = generate_array(n, state);
-        printf("\n\nOrig.:  ");
-        for(int i=0; i<n; i++){
-            printf("%d ", vet[i]);
-        }
+
         for(int algorithm = 0; algorithm < 7; algorithm++) { // algorithm: SELECTION, INSERTION, SHELL, QUICK, HEAP, MERGE
             sort_array(vet, n, algorithm);
-            printf("\nSorted: ");
-            for(int i=0; i<n; i++) {
-                printf("%d ", vet[i]);
-            }
         }
     }
 }

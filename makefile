@@ -25,7 +25,7 @@ ifeq ($(shell uname -s), Darwin)
 C_COMPILER=clang
 endif
 
-UNITY_ROOT=../Unity/
+UNITY_ROOT=Unity/
 
 CFLAGS=-std=c99
 CFLAGS += -Wall
@@ -53,6 +53,7 @@ FILE_NAME = src/sort
 SRC_FILES1=\
   $(UNITY_ROOT)/src/unity.c \
   $(UNITY_ROOT)/extras/fixture/src/unity_fixture.c \
+  src/array.c \
   $(FILE_NAME).c \
   test/TestSortArray.c \
   test/test_runners/TestSortArray_Runner.c \
@@ -61,10 +62,10 @@ INC_DIRS=-Isrc -I$(UNITY_ROOT)/src -I$(UNITY_ROOT)/extras/fixture/src
 
 all: clean compile run
 
-compile:
+compile: clean
 	$(C_COMPILER) $(CFLAGS) $(INC_DIRS) $(SYMBOLS) $(SRC_FILES1) -o $(TARGET1)
 
-cov:
+cov: clean
 	$(C_COMPILER) -fprofile-arcs -ftest-coverage $(CFLAGS) $(INC_DIRS) $(SRC_FILES1) -o gcov/$@
 	mv *.gcno gcov/
 
@@ -78,12 +79,13 @@ gcov: run_cov
 cppcheck: $(FILE_NAME).c
 	cppcheck --enable=all --suppress=missingIncludeSystem $(FILE_NAME).c
 
-sanitizer: main.c
+valgrind: clean $(FILE_NAME).c
+	$(C_COMPILER) -g -Wall -Wfatal-errors $(FILE_NAME).c -o $(FILE_NAME)
+	valgrind --leak-check=full --show-leak-kinds=all ./$(FILE_NAME)
+
+sanitizer: clean main.c
 	#$(GCC) $(GCCFLAGS) -fsanitize=address main.c -o $(FILE_NAME)
 	gcc main.c -o teste -fsanitize=address -static-libasan -g
-
-valgrind: bar
-	valgrind --leak-check=full --show-leak-kinds=all ./teste
 
 array.o:src/array.c
 	gcc -o $@ -c $<
@@ -97,7 +99,7 @@ get_opt.o:src/get_opt.c
 main.o:src/main.c
 	gcc -o $@ -c $<
 
-app: array.o sort.o get_opt.o main.o
+app: clean array.o sort.o get_opt.o main.o
 	gcc $(ALL_LDFLAGS) -o $@ $+ $(LIBRARIES)
 
 run_app: app

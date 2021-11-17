@@ -185,27 +185,30 @@ int* sort_array(int *array, int size, int method){
     switch(method){
         case SELECTION:
             selection_sort(array, size);
-        break;
+            break;
 
         case INSERTION:
             insertion_sort(array, size);
-        break;
+            break;
 
         case SHELL:
             shell_sort(array, size);
-        break;
+            break;
 
         case QUICK:
             quick_sort(array, 0, size - 1);
-        break;
+            break;
 
         case HEAP:
             heap_sort(array, size);
-        break;
+            break;
 
         case MERGE:
             merge_sort(array, size);
-        break;       
+            break;
+
+        default:
+            break;
     }
     return array;
 }

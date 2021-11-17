@@ -10,4 +10,6 @@ TEST_GROUP_RUNNER(SortArray)
   RUN_TEST_CASE(SortArray, TestSortArray5);
   RUN_TEST_CASE(SortArray, TestSortArray6);
   RUN_TEST_CASE(SortArray, TestSortArray7);
+  RUN_TEST_CASE(SortArray, TestSortArray8);
+  RUN_TEST_CASE(SortArray, TestSortArray9);
 }

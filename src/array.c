@@ -12,7 +12,7 @@ void random_array(int *array, int size) {
     srand(time(NULL));
     int i;
     for(i = 0; i < size; i++) {
-        array[i] = rand() % size;
+        array[i] = (rand() % size) -1;
     }
 }
 
@@ -23,8 +23,8 @@ void random_array(int *array, int size) {
  */
 void ascending_array(int *array, int size) {
     int i;
-    for(i = 1; i < size; i++) {
-        array[i] = i;
+    for(i = -1; i < (size - 2); i++) {
+        array[i + 1] = i;
     }
 }
 
@@ -35,7 +35,7 @@ void ascending_array(int *array, int size) {
  */
 void descending_array(int *array, int size) {
     int i, j;
-    for(i = 0, j = size; i < size; i++, j--) {
+    for(i = 0, j = size - 2; i < size; i++, j--) {
         array[i] = j;
     }
 }
@@ -50,8 +50,8 @@ void almost_ordered_array(int *array, int size) {
     srand(time(NULL));
     int ninety_percent_size = (int)size/10 * 9;
     int i = 0;
-    for(i = 1; i <= ninety_percent_size; i++) {
-        array[i] = i;
+    for(i = -1; i <= ninety_percent_size -2; i++) {
+        array[i+1] = i;
     }
 
     for(i = ninety_percent_size; i < size; i++) {

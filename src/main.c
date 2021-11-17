@@ -39,13 +39,13 @@ int main(int argc, char **argv) {
     printf("Array size: %d\n", size);
 
     if(print_vector){
-        printf("Original: ");
+        printf("Original:");
         for(i=0; i<size; i++){
-            printf("%d ", vet_aux[i]);
+            printf(" %2d", vet_aux[i]);
         }
-        printf("\nSorted: ");
+        printf("\nSorted:  ");
         for(i=0; i<size; i++){
-            printf("%d ", vet[i]);
+            printf(" %2d", vet[i]);
         }
     }
     free(vet);

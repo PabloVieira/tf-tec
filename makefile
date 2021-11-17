@@ -60,10 +60,21 @@ SRC_FILES1=\
   test/test_runners/all_tests.c
 INC_DIRS=-Isrc -I$(UNITY_ROOT)/src -I$(UNITY_ROOT)/extras/fixture/src
 
+VALGRIND  = -g -Wall -Wfatal-errors
+
+SANITIZER  = -fsanitize=address
+
+ARGS = -a quick -n 8 -s random -P
+
 all: clean compile run
+
+all_tests: gcov cppcheck valgrind sanitizer
 
 compile: clean
 	$(C_COMPILER) $(CFLAGS) $(INC_DIRS) $(SYMBOLS) $(SRC_FILES1) -o $(TARGET1)
+
+unity: compile
+	./$(TARGET1)
 
 cov: clean
 	$(C_COMPILER) -fprofile-arcs -ftest-coverage $(CFLAGS) $(INC_DIRS) $(SRC_FILES1) -o gcov/$@
@@ -79,34 +90,33 @@ gcov: run_cov
 cppcheck: $(FILE_NAME).c
 	cppcheck --enable=all --suppress=missingIncludeSystem $(FILE_NAME).c
 
-valgrind: clean $(FILE_NAME).c
-	$(C_COMPILER) -g -Wall -Wfatal-errors $(FILE_NAME).c -o $(FILE_NAME)
-	valgrind --leak-check=full --show-leak-kinds=all ./$(FILE_NAME)
+valgrind: array.o sort.o get_opt.o main.o
+	gcc $(VALGRIND) $(ALL_LDFLAGS) -o app $+ $(LIBRARIES)
+	valgrind --leak-check=full --show-leak-kinds=all ./app -a quick -n 8 -s random -P
 
-sanitizer: clean main.c
-	#$(GCC) $(GCCFLAGS) -fsanitize=address main.c -o $(FILE_NAME)
-	gcc main.c -o teste -fsanitize=address -static-libasan -g
+sanitizer: array.o sort.o get_opt.o main.o
+	gcc $(VALGRIND) $(SANITIZER) $(ALL_LDFLAGS) -o app $+ $(LIBRARIES)
+	./app -a quick -n 8 -s random -P
 
 array.o:src/array.c
-	gcc -o $@ -c $<
+	gcc -g -Wall -Wfatal-errors -o $@ -c $<
 
 sort.o:src/sort.c
-	gcc -o $@ -c $<
+	gcc -g -Wall -Wfatal-errors -o $@ -c $<
 
 get_opt.o:src/get_opt.c
-	gcc -o $@ -c $<
+	gcc -g -Wall -Wfatal-errors -o $@ -c $<
 
 main.o:src/main.c
-	gcc -o $@ -c $<
+	gcc -g -Wall -Wfatal-errors -o $@ -c $<
 
-app: clean array.o sort.o get_opt.o main.o
+app: array.o sort.o get_opt.o main.o
 	gcc $(ALL_LDFLAGS) -o $@ $+ $(LIBRARIES)
 
-run_app: app
-	- ./app -a quick -n 8 -s random -P
+run: app
+	- ./app $(ARGS)
 
-run:
-	- ./$(TARGET1) -v
+test: all_tests
 
 clean:
 	$(CLEANUP) $(TARGET1) src/*.o *.o *.dSYM *.gcda *.gcov gcov/* app

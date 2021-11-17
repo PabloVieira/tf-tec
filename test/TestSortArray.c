@@ -72,10 +72,62 @@ TEST(SortArray, TestSortArray6)
 TEST(SortArray, TestSortArray7)
 {
     n = 10;
+
     for( int state = 0; state <= 3; state++){ // state: RANDOM_ORDER, ASCENDING_ORDER, DESCENDING_ORDER, ALMOST_ORDERED
         // Create the vector with the specified size and situation
         int *vet = generate_array(n, state);
-        for(int algorithm = 0; algorithm < 7; algorithm++) // algorithm: SELECTION, INSERTION, SHELL, QUICK, HEAP, MERGE
+        printf("\n\nOrig.:  ");
+        for(int i=0; i<n; i++){
+            printf("%d ", vet[i]);
+        }
+        for(int algorithm = 0; algorithm < 7; algorithm++) { // algorithm: SELECTION, INSERTION, SHELL, QUICK, HEAP, MERGE
             sort_array(vet, n, algorithm);
+            printf("\nSorted: ");
+            for(int i=0; i<n; i++) {
+                printf("%d ", vet[i]);
+            }
+        }
+    }
+}
+
+TEST(SortArray, TestSortArray8)
+{
+    n = 5;
+
+    for( int state = 0; state <= 3; state++){ // state: RANDOM_ORDER, ASCENDING_ORDER, DESCENDING_ORDER, ALMOST_ORDERED
+        // Create the vector with the specified size and situation
+        int vet[] = {0, 0, 0, 0, 0};
+        printf("\n\nOrig.: ");
+        for(int i=0; i<n; i++){
+            printf(" %2d", vet[i]);
+        }
+        for(int algorithm = 0; algorithm < 7; algorithm++) { // algorithm: SELECTION, INSERTION, SHELL, QUICK, HEAP, MERGE
+            sort_array(vet, n, algorithm);
+            printf("\nSorted:");
+            for(int i=0; i<n; i++) {
+                printf(" %2d", vet[i]);
+            }
+        }
+    }
+}
+
+TEST(SortArray, TestSortArray9)
+{
+    n = 5;
+
+    for( int state = 0; state <= 3; state++){ // state: RANDOM_ORDER, ASCENDING_ORDER, DESCENDING_ORDER, ALMOST_ORDERED
+        // Create the vector with the specified size and situation
+        int vet[] = {-1, -5, -2, -4, -3};
+        printf("\n\nOrig.: ");
+        for(int i=0; i<n; i++){
+            printf(" %2d", vet[i]);
+        }
+        for(int algorithm = 0; algorithm < 7; algorithm++) { // algorithm: SELECTION, INSERTION, SHELL, QUICK, HEAP, MERGE
+            sort_array(vet, n, algorithm);
+            printf("\nSorted:");
+            for(int i=0; i<n; i++) {
+                printf(" %2d", vet[i]);
+            }
+        }
     }
 }

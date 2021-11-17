@@ -94,7 +94,6 @@ app: array.o sort.o get_opt.o main.o
 run: build
 	./app
 
-
 clean:
 	rm -f *.o
 	rm -f app

@@ -2,7 +2,7 @@
 
 static void RunAllTests(void)
 {
-  RUN_TEST_GROUP(Bar);
+  RUN_TEST_GROUP(SortArray);
 }
 
 int main(int argc, const char * argv[])

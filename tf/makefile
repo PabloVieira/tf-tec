@@ -10,12 +10,12 @@ ifeq ($(OS),Windows_NT)
 	CLEANUP = del /F /Q
 	MKDIR = mkdir
   else # in a bash-like shell, like msys
-	CLEANUP = rm -f
+	CLEANUP = rm -fr
 	MKDIR = mkdir -p
   endif
 	TARGET_EXTENSION=.exe
 else
-	CLEANUP = rm -f
+	CLEANUP = rm -fr
 	MKDIR = mkdir -p
 	TARGET_EXTENSION=.out
 endif
@@ -25,7 +25,7 @@ ifeq ($(shell uname -s), Darwin)
 C_COMPILER=clang
 endif
 
-UNITY_ROOT = ../Unity/
+UNITY_ROOT=../Unity/
 
 CFLAGS=-std=c99
 CFLAGS += -Wall
@@ -42,28 +42,72 @@ CFLAGS += -Wstrict-prototypes
 CFLAGS += -Wundef
 CFLAGS += -Wold-style-definition
 
+ALL_LDFLAGS :=
+ALL_LDFLAGS += $(ALL_CCFLAGS)
+ALL_LDFLAGS += $(addprefix -Xlinker ,$(LDFLAGS))
+ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
+
 TARGET_BASE1=all_tests
 TARGET1 = $(TARGET_BASE1)$(TARGET_EXTENSION)
+FILE_NAME = src/sort
 SRC_FILES1=\
   $(UNITY_ROOT)/src/unity.c \
   $(UNITY_ROOT)/extras/fixture/src/unity_fixture.c \
-  src/bar.c \
-  test/TestBar.c \
-  test/test_runners/TestBar_Runner.c \
+  $(FILE_NAME).c \
+  test/TestSortArray.c \
+  test/test_runners/TestSortArray_Runner.c \
   test/test_runners/all_tests.c
 INC_DIRS=-Isrc -I$(UNITY_ROOT)/src -I$(UNITY_ROOT)/extras/fixture/src
-SYMBOLS=
 
 all: clean compile run
 
 compile:
 	$(C_COMPILER) $(CFLAGS) $(INC_DIRS) $(SYMBOLS) $(SRC_FILES1) -o $(TARGET1)
 
+cov:
+	$(C_COMPILER) -fprofile-arcs -ftest-coverage $(CFLAGS) $(INC_DIRS) $(SRC_FILES1) -o gcov/$@
+	mv *.gcno gcov/
+
+run_cov: cov
+	- ./gcov/cov -v
+	mv *.gcda gcov/
+
+gcov: run_cov
+	gcov -b gcov/sort
+
+cppcheck: $(FILE_NAME).c
+	cppcheck --enable=all --suppress=missingIncludeSystem $(FILE_NAME).c
+
+sanitizer: main.c
+	#$(GCC) $(GCCFLAGS) -fsanitize=address main.c -o $(FILE_NAME)
+	gcc main.c -o teste -fsanitize=address -static-libasan -g
+
+valgrind: bar
+	valgrind --leak-check=full --show-leak-kinds=all ./teste
+
+array.o:src/array.c
+	gcc -o $@ -c $<
+
+sort.o:src/sort.c
+	gcc -o $@ -c $<
+
+get_opt.o:src/get_opt.c
+	gcc -o $@ -c $<
+
+main.o:src/main.c
+	gcc -o $@ -c $<
+
+app: array.o sort.o get_opt.o main.o
+	gcc $(ALL_LDFLAGS) -o $@ $+ $(LIBRARIES)
+
+run_app: app
+	- ./app -a quick -n 8 -s random -P
+
 run:
 	- ./$(TARGET1) -v
 
 clean:
-	$(CLEANUP) $(TARGET1)
+	$(CLEANUP) $(TARGET1) src/*.o *.o *.dSYM *.gcda *.gcov gcov/* app
 
 ci: CFLAGS += -Werror
 ci: compile
